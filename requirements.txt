@@ -1,0 +1,5 @@
+flet==0.25.1
+playwright==1.49.0
+ruff==0.8.2
+
+

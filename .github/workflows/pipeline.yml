@@ -1,0 +1,75 @@
+name: Flet App Build Workflow
+
+on:
+  push:
+    branches:
+      - main  # Run the workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Run the workflow on pull requests targeting the main branch
+
+jobs:
+  build_mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Flet app build (macOS)
+        run: |
+          flet run my_app.py  # Replace with your actual command to run the app
+
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Flet app build (Windows)
+        run: |
+          flet run my_app.py  # Replace with your actual command to run the app
+
+  build_android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set up Android SDK (if required)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y android-sdk
+
+      - name: Run Flet app build (Android)
+        run: |
+          flet run my_app.py  # Replace with your actual command to run the app
