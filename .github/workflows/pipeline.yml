@@ -1,75 +1,67 @@
-name: All Builds (Windows, macOS, Android - APK & AAB)
+name: Build Flet App for macOS and Windows
 
 on:
   push:
     branches:
-      - master
       - main
   pull_request:
     branches:
-      - master
       - main
-  workflow_dispatch: # Allows you to manually trigger the workflow
-
-env:
-  BUILD_NUMBER: 1
-  BUILD_VERSION: 1.0.0
-  PYTHON_VERSION: 3.11
-  FLUTTER_VERSION: 3.24
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-      - name: Build for Windows
-        run: |
-          flutter config --no-analytics
-          flet build windows --verbose --build-number=${{ env.BUILD_NUMBER }} --build-version=${{ env.BUILD_VERSION }}
-      - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build-artifact
-          path: build/windows
-          if-no-files-found: warn
+  build:
+    runs-on: ${{ matrix.os }}
 
-  build-macos:
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        os: [ macos-latest, windows-latest ]
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 11
+        uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.11'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-      - name: Build for macOS
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          elif [ -f "pyproject.toml" ]; then
+            pip install -e .
+          fi
+
+      - name: Set Python IO Encoding to UTF-8 (Windows)
+        if: runner.os == 'Windows'
         run: |
-          flutter config --no-analytics
-          flet build macos --verbose --build-number=${{ env.BUILD_NUMBER }} --build-version=${{ env.BUILD_VERSION }}
-      - name: Upload macOS Artifact
-        uses: actions/upload-artifact@v4
+          echo "Setting Python IO Encoding to UTF-8"
+          set PYTHONIOENCODING=utf-8
+
+      - name: Install PyInstaller
+        run: |
+          python -m pip install pyinstaller
+
+      - name: Build the Flet App with PyInstaller (macOS or Windows)
+        run: |
+          pyinstaller --onefile main.py
+
+      # Upload the artifact (the built executable in the dist folder)
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: macos-build-artifact
-          path: build/macos
-          if-no-files-found: warn
+          name: flet-app-build
+          path: dist/*  # This assumes PyInstaller's output is in the 'dist/' folder
+
+  download_artifacts:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download the artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: flet-app-build
+          path: ./downloaded-artifacts  # Location to save the downloaded files
