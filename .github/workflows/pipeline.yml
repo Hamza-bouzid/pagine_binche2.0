@@ -48,6 +48,8 @@ jobs:
           if [ $RUNNER_OS == 'Windows' ]; then
             # Install Flutter for Windows
             choco install flutter
+            # Refresh the environment to make the flutter command available
+            refreshenv
             flutter doctor
           fi
         shell: bash
@@ -59,12 +61,17 @@ jobs:
       # Build for macOS
       - name: Build for macOS
         if: runner.os == 'macOS'
-        run: flet build macos --output ./build_output
+        run: |
+          flet build macos --output ./build_output
+          # Add extra logging to ensure the process doesn't get canceled unexpectedly
+          echo "Build completed for macOS"
 
       # Build for Windows
       - name: Build for Windows
         if: runner.os == 'Windows'
-        run: flet build windows --output ./build_output
+        run: |
+          flet build windows --output ./build_output
+          echo "Build completed for Windows"
 
       # Upload the build artifacts
       - name: Upload artifacts
