@@ -32,22 +32,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pyinstaller pillow
-        shell: bash
 
       # Step 4: Build the app for macOS (Apple Silicon)
       - name: Build for macOS (Apple Silicon)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller main.py --noconsole --noconfirm --onefile \
-            --target-arch arm64
-        shell: bash
+          flet pack main.py
 
       # Step 4: Build the app for Windows
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller main.py --noconsole --noconfirm --onefile
-        shell: bash
+           flet pack main.py
 
       # Step 5: Upload artifacts
       - name: Upload artifacts
