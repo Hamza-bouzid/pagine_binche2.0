@@ -20,7 +20,7 @@ class PlaywrightScraper(IScraper):
         results = []
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=False)
+            browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             page.goto(f"https://www.paginebianche.it/ricerca?qs={query}&dv={location}")
 
@@ -28,10 +28,9 @@ class PlaywrightScraper(IScraper):
             self.reject_cookies(page)
 
             # Scrape the data
-            while True:
-                self.load_more_results(page)
-                results.extend(self.extract_results(page, on_update))
-                break
+
+            self.load_more_results(page)
+            results.extend(self.extract_results(page, on_update))
 
             browser.close()
 

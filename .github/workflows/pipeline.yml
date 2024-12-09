@@ -1,4 +1,4 @@
-name: Build and Package Flet App for Apple Silicon
+name: Build and Package Flet App for Apple Silicon and Windows
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest ]
+        os: [macos-latest, windows-latest]
 
     steps:
       # Step 1: Check out the repository
@@ -31,23 +31,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pyinstaller pillow
+          playwright install
         shell: bash
 
-      # Step 4: Build the app for macOS (Apple Silicon)
+      # Step 4a: Build the app for macOS (Apple Silicon)
       - name: Build for macOS (Apple Silicon)
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller main.py --noconsole --noconfirm --onefile --target-arch arm64
-      # Step 4: Build the app for Windows
-      - name: Build for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          pyinstaller main.py --noconsole --noconfirm --onefile
+           flet pack main.py
+        shell: bash
 
-      # Step 5: Upload artifacts
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Flet-App-${{ matrix.os }}
-          path: dist/*
+#      # Step 4b: Build the app for Windows
+#      - name: Build for Windows
+#        if: matrix.os == 'windows-latest'
+#        run: |
+#          pyinstaller main.py --noconsole --noconfirm --onefile
+#        shell: bash
+#
+#      # Step 5: Upload artifacts
+#      - name: Upload artifacts
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: Flet-App-${{ matrix.os }}
+#          path: |
+#            dist/main.exe
+#            dist/main
