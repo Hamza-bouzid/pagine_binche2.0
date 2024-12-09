@@ -1,5 +1,8 @@
 flet==0.25.1
 playwright==1.49.0
+pyinstaller_versionfile==3.0.0
+pyinstaller==6.11.1
 ruff==0.8.2
+
 
 
