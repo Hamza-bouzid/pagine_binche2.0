@@ -42,7 +42,7 @@ jobs:
         fi
 
         # Execute the shell script to build the app
-        python3 exec_deploy.py
+        ./deploy/python3 exec_deploy.py
 
     - name: Upload Windows artifact
       if: runner.os == 'Windows'
