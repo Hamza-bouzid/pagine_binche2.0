@@ -38,6 +38,7 @@ jobs:
       - name: Build for macOS
         if: matrix.os == 'macos-latest'
         run: |
+          chmod -R +x dist/main.app
           pyinstaller main.py --noconsole --noconfirm --onefile
         shell: bash
 
