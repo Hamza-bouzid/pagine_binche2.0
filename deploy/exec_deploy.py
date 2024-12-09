@@ -34,6 +34,7 @@ if __name__ == "__main__":
     cmd = ['python', '-m', 'PyInstaller',
            '--name', 'Bianche',
            '--noconfirm',
+           '--windowed',
            '--noconsole',
            '--onefile', MAIN_PATH,
            '--add-data', ICON_PATH + SEPARATOR,

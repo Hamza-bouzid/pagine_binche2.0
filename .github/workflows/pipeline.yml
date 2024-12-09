@@ -25,35 +25,36 @@ jobs:
       with:
         python-version: '3.11'  # Specify the desired Python version
 
-    - name: Install dependencies (Linux/macOS/Windows)
+    - name: Install dependencies (macOS/Windows)
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller pyinstaller-versionfile
 
     - name: Run the build shell script
       run: |
+        # Check the OS and run platform-specific code
         if [ "${{ runner.os }}" == "Windows" ]; then
-          # Windows-specific setup, if any, can go here
+          # PowerShell on Windows, use appropriate syntax
           echo "Running on Windows"
-        fi
-        if [ "${{ runner.os }}" == "macOS" ]; then
-          # macOS-specific setup, if any, can go here
+          # Add any Windows-specific setup or installation if needed
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          # macOS-specific setup
           echo "Running on macOS"
         fi
 
-        # Execute the shell script to build the app
-        python3 deploy/exec_deploy.py
+        # Execute the Python script to build the app
+        python3 exec_deploy.py
 
     - name: Upload Windows artifact
       if: runner.os == 'Windows'
       uses: actions/upload-artifact@v3
       with:
         name: windows-app
-        path: deploy/output/windows/dist/*  # Adjust this to your actual Windows app location
+        path: deploy/output/windows/dist/Bianche.exe  # Adjust this to your actual Windows app location
 
     - name: Upload macOS artifact
       if: runner.os == 'macOS'
       uses: actions/upload-artifact@v3
       with:
         name: macos-app
-        path: deploy/output/macOS/dist/*  # Adjust this to your actual macOS app location
+        path: deploy/output/macOS/dist/Bianche.app  # Adjust this to your actual macOS app location
