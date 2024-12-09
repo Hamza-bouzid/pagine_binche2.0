@@ -48,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Flet-App-${{ matrix.os }}
-          path: deply/output/*/dist/*
+          path: deploy/output/*/dist/*
