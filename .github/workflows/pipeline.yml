@@ -1,4 +1,4 @@
-name: Build and Package Flet App for Apple Silicon
+name: Build ELT App
 
 on:
   push:
@@ -7,47 +7,54 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest ]
+        os: [ubuntu-latest, windows-latest, macos-latest]  # Define the platforms you want to target
 
     steps:
-      # Step 1: Check out the repository
-      - name: Check out repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Step 2: Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Set up Python (for pyinstaller and pyinstaller-versionfile)
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'  # Specify the desired Python version
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller pillow
+    - name: Install dependencies (Linux/macOS/Windows)
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller pyinstaller-versionfile
 
-      # Step 4: Build the app for macOS (Apple Silicon)
-      - name: Build for macOS (Apple Silicon)
-        if: matrix.os == 'macos-latest'
-        run: |
-          flet pack main.py
+    - name: Run the build shell script
+      run: |
+        fi
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          # Windows-specific setup, if any, can go here
+          echo "Running on Windows"
+        fi
+        if [ "${{ runner.os }}" == "macOS" ]; then
+          # macOS-specific setup, if any, can go here
+          echo "Running on macOS"
+        fi
 
-      # Step 4: Build the app for Windows
-      - name: Build for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-           flet pack main.py
+        # Execute the shell script to build the app
+        python3 exec_deploy.py
 
-      # Step 5: Upload artifacts
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Flet-App-${{ matrix.os }}
-          path: dist/*
+    - name: Upload Windows artifact
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-app
+        path: deploy/output/windows/dist/Bianche.exe  # Adjust this to your actual Windows app location
+
+    - name: Upload macOS artifact
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-app
+        path: deploy/output/macOS/dist/Bianche.app  # Adjust this to your actual macOS app location
