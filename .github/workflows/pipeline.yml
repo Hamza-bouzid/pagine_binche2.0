@@ -56,4 +56,4 @@ jobs:
           name: Flet-App-${{ matrix.os }}
           path: |
             dist/main.exe
-            dist/main
+            dist/main.app
