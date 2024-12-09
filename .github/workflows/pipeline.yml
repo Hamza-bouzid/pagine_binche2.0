@@ -49,11 +49,11 @@ jobs:
 #          pyinstaller main.py --noconsole --noconfirm --onefile
 #        shell: bash
 #
-#      # Step 5: Upload artifacts
-#      - name: Upload artifacts
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: Flet-App-${{ matrix.os }}
-#          path: |
-#            dist/main.exe
-#            dist/main
+      # Step 5: Upload artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Flet-App-${{ matrix.os }}
+          path: |
+            dist/main.exe
+            dist/main
