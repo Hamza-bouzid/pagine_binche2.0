@@ -1,9 +1,9 @@
-name: Build and Deploy
+name: Build and Package Flet App for Apple Silicon
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -13,49 +13,45 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]  # Only macOS and Windows
-        python: [3.11]  # Use Python 3.11
+        os: [ macos-latest, windows-latest ]
+
     steps:
-      - name: Checkout code
+      # Step 1: Check out the repository
+      - name: Check out repository
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
+          python-version: '3.11'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pyinstaller pillow
+        shell: bash
 
-      - name: Build app
+      # Step 4: Build the app for macOS (Apple Silicon)
+      - name: Build for macOS (Apple Silicon)
+        if: matrix.os == 'macos-latest'
         run: |
-          flet pack main.py --name counter --icon icon.png --product-name counter --product-version "1.2.3" --copyright "Copyright (c) 2022 YourCompany Inc."
+          pyinstaller main.py --noconsole --noconfirm --onefile \
+            --target-arch arm64
+        shell: bash
 
-      - name: Create package
+      # Step 4: Build the app for Windows
+      - name: Build for Windows
+        if: matrix.os == 'windows-latest'
         run: |
-          if [[ $RUNNER_OS == 'macOS' ]]; then
-            tar -czvf counter-macos.tar.gz -C dist counter.app
-            echo "counter-macos.tar.gz" >> $GITHUB_ENV
-          elif [[ $RUNNER_OS == 'Windows' ]]; then
-            7z a counter-windows.zip %CD%\dist\*.exe
-            echo "counter-windows.zip" >> $GITHUB_ENV
-          fi
+          pyinstaller main.py --noconsole --noconfirm --onefile
+        shell: bash
 
-      - name: Upload artifact
+      # Step 5: Upload artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: counter-artifact
-          path: ${{ env.counter-artifact }}
-
-  deploy:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest  # Deploy on ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ${{ env.counter-artifact }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: Flet-App-${{ matrix.os }}
+          path: dist/*
