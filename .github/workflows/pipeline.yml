@@ -38,13 +38,13 @@ jobs:
       - name: Build for macOS
         if: matrix.os == 'macos-latest'
         run: |
-          pyinstaller main.py --noconsole --noconfirm --onefile --add-data "assets:assets" --icon your-icon.icns
+          pyinstaller main.py --noconsole --noconfirm --onefile
         shell: bash
 
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller main.py --noconsole --noconfirm --onefile --add-data "assets;assets" --icon your-icon.ico
+          pyinstaller main.py --noconsole --noconfirm --onefile
         shell: bash
 
       # Step 5: Upload artifacts
