@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]  # Define the platforms you want to target
+        os: [windows-latest, macos-latest]  # Define the platforms you want to target
 
     steps:
     - name: Checkout code
@@ -49,11 +49,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: windows-app
-        path: deploy/output/windows/dist/Bianche.exe  # Adjust this to your actual Windows app location
+        path: deploy/output/windows/dist/*  # Adjust this to your actual Windows app location
 
     - name: Upload macOS artifact
       if: runner.os == 'macOS'
       uses: actions/upload-artifact@v3
       with:
         name: macos-app
-        path: deploy/output/macOS/dist/Bianche.app  # Adjust this to your actual macOS app location
+        path: deploy/output/macOS/dist/*  # Adjust this to your actual macOS app location
