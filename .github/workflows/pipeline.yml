@@ -1,4 +1,4 @@
-name: Build and Package Flet App
+name: Build and Package Flet App for Apple Silicon
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [ macos-latest, windows-latest ]
 
     steps:
       # Step 1: Check out the repository
@@ -34,14 +34,15 @@ jobs:
           pip install pyinstaller pillow
         shell: bash
 
-      # Step 4: Build the app
-      - name: Build for macOS
+      # Step 4: Build the app for macOS (Apple Silicon)
+      - name: Build for macOS (Apple Silicon)
         if: matrix.os == 'macos-latest'
         run: |
-          chmod -R +x dist/main.app
-          pyinstaller main.py --noconsole --noconfirm --onefile
+          pyinstaller main.py --noconsole --noconfirm --onefile \
+            --target-arch arm64
         shell: bash
 
+      # Step 4: Build the app for Windows
       - name: Build for Windows
         if: matrix.os == 'windows-latest'
         run: |
